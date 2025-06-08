@@ -53,7 +53,7 @@ export const  RegisterUser = async (req, res) => {
 
     } catch (error) {
         console.log("error occured while creating new user", error)
-        res.status(200).json({
+        res.status(500).json({
             message:"error occured while creating new user",
             success:false ,
             error
@@ -122,6 +122,53 @@ export const  LoginUser = async (req, res) => {
    }
 }
 
-export const  Generate_Api_key = (req, res) => {
+export const  Generate_Api_key = async (req, res) => {
+
+    try {
+        const user_Id = req.user.id ;
+        const key = crypto.randomBytes(32).toString("hex")
+        
+        const Api_Key = await db.ApiKey.create({
+            data:{
+                key ,
+                userId : user_Id ,
+            }
+        })
+
+        res.status(201).json({
+            message:"api key generated successfully",
+            apiKey: Api_Key.key
+        })
+
+    } catch (error) {
+        console.log("error occured while generating api key")
+        res.status(500).json({message:"error occured while generating api key"})
+    }
+}
+
+
+export const UserProfile = async (req, res)=> {
+
+    try {
+        const user_id = req.user.id;
+        const User_profile = await db.User.findUnique({
+            where:{id:user_id},
+            select:{
+                name:true ,
+                email:true ,
+                createdAt:true,
+                role:true
+            }
+        })
     
+        return res.status(200).json({
+            message:"user profile fetched successfully",
+            profile:User_profile
+        })
+    } catch (error) {
+
+        console.log("error occured while fetching user profile")
+        res.status(500).json({message:"error occured while fetching user profile"})
+        
+    }
 }

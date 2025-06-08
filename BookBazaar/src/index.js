@@ -17,7 +17,7 @@ app.use(express.urlencoded());
 app.use(cookieParser())
 
 
-app.use("/api/v1/users", UserRouter);
+app.use("/api/v1/auth", UserRouter);
 
 app.listen(port , ()=>{
     console.log(`Server started at port ${port}`)

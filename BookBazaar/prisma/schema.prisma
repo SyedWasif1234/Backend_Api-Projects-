@@ -14,15 +14,41 @@ datasource db {
   url      = env("NEON_DBURL")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ApiKey_Role {
+  USER
+  ADMIN
+  BLOCKED
+  READ_ONLY
+}
+
 model User {
   id                  String   @id @default(cuid())
   name                String
   email               String   @unique
   password            String
-  role                String   @default("user")
-  verificationToken    String?
+  role                UserRole @default(USER)
+  verificationToken   String?
   passwordResetToken  String?
   PasswordResetExpiry String?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @default(now())
+
+  apiKeys ApiKey[]
+}
+
+model ApiKey {
+  id        String      @id @default(cuid())
+  key       String      @unique
+  userId    String
+  createdAt DateTime    @default(now())
+  expiresAt DateTime?
+  isActive  Boolean     @default(true)
+  role      ApiKey_Role @default(USER)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
