@@ -1,0 +1,40 @@
+:( Error :
+    in my book routes i passed /:id as params and in my controller i am accessing it as 
+    const {book_id}= req.params but here book id is coming null 
+
+    :)fixed:
+        /:book_id in  router == const const {book_id}= req.params in controller
+
+
+:) schema Relation:
+
+    /*  Entity                           Relation                         
+    ---------------------------------------------------------------------   
+    User ↔️ Book (purchase)   ->   Many-to-Many via `PurchasedBook` 
+    User → Review              ->   One-to-Many                      
+    Book → Review              ->   One-to-Many                     
+    */
+
+:) PRISMA QUERY 
+
+    Operator	     Meaning
+    gte	     ->       Greater than or equal (>=)
+    lte	     ->      Less than or equal (<=)
+    gt	     ->        Greater than (>)
+    lt	     ->       Less than (<)
+    equals	 ->        Equal to (=)
+
+=>Accessing query
+    req.query :  GET /books?title=prince&minPrice=100
+
+:) req.header i have to include in header : 
+
+    ✅ 1. Using Postman
+
+       -> Select the request method: GET
+       -> URL: http://localhost:5000/some-protected-route (or your actual URL)
+       -> Go to the Headers tab
+       ->Add a new header:
+       -> Key: x-api-key
+       -> Value: your generated API key (e.g., abc123...)
+

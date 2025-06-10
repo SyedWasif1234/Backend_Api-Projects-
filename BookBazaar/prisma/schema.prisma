@@ -17,6 +17,7 @@ datasource db {
 enum UserRole {
   USER
   ADMIN
+  OWNER
 }
 
 enum ApiKey_Role {
@@ -24,6 +25,12 @@ enum ApiKey_Role {
   ADMIN
   BLOCKED
   READ_ONLY
+}
+
+enum OrderStatus {
+  PLACED
+  CANCELLED
+  COMPLETED
 }
 
 model User {
@@ -36,11 +43,13 @@ model User {
   passwordResetToken  String?
   PasswordResetExpiry String?
   createdAt           DateTime @default(now())
-  updatedAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   apiKeys   ApiKey[]
   purchases PurchasedBook[]
   Reviews   Review[]
+  owner     Owner[]
+  order     Order[]
 }
 
 model ApiKey {
@@ -56,15 +65,17 @@ model ApiKey {
 }
 
 model Book {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   title       String
   author      String
   price       Float
   description String
-  createdAt   DateTime @default(now())
-
-  purchases PurchasedBook[]
-  reviews   Review[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @default(now())
+  purchases   PurchasedBook[]
+  reviews     Review[]
+  owner       Owner[]
+  order       Order[]
 }
 
 model PurchasedBook {
@@ -91,12 +102,29 @@ model Review {
   book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 }
 
+model Owner {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  userId    String
+  bookId    String
+  createdAt DateTime @default(now())
 
-/*  Entity                           Relation                         
- ---------------------------------------------------------------------   
- User ↔️ Book (purchase)   ->   Many-to-Many via `PurchasedBook` 
- User → Review              ->   One-to-Many                      
- Book → Review              ->   One-to-Many                     
- */
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
- 
+  @@unique([userId, bookId]) // ✅ Composite Unique Constraint
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  userId    String
+  bookId    String
+  status    OrderStatus @default(PLACED)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId]) //This will prevent placing multiple orders for the same book by the same user.
+}

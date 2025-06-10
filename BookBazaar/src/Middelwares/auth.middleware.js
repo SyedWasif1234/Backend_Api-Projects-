@@ -40,6 +40,7 @@ export const apiKeyAuthMiddleware  = async (req, res , next) => {
     try {
         
         const apiKey = req.headers['x-api-key'];
+        console.log("api key in aapi key middleware :", apiKey)
         if(!apiKey){
             res.status(401).json({message:"Api Key is missing"})
         }
